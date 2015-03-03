@@ -1,0 +1,52 @@
+<?php
+//panggil file config.php untuk menghubung ke server
+include('config.php');
+
+//tangkap data dari form
+//$id = $_POST['id'];
+$no_induk = $_POST['no_induk'];
+//$user = $_POST['user'];
+//$pass = $_POST['pass'];
+$nama = $_POST['nama'];
+$jenis_kelamin = $_POST['jenis_kelamin'];
+$lahir = $_POST['lahir'];
+$tgl = $_POST['tgl'];
+$status_anak = $_POST['status_anak'];
+$anak_ke = $_POST['anak_ke'];
+$alamat = $_POST['alamat'];
+$kelas = $_POST['kelas'];
+$angkatan = $_POST['angkatan'];
+$no_telepon= $_POST['no_telepon'];
+$nama_ayah = $_POST['nama_ayah'];
+$nama_ibu = $_POST['nama_ibu'];
+$pekerjaan_ayah = $_POST['pekerjaan_ayah'];
+$pekerjaan_ibu = $_POST['pekerjaan_ibu'];
+$no_telepon_orang_tua = $_POST['no_telepon_orang_tua'];
+$nama_wali = $_POST['nama_wali'];
+$pekerjaan_wali = $_POST['pekerjaan_wali'];
+$no_telepon_wali = $_POST['no_telepon_wali'];
+$alamat_orang_tua = $_POST['alamat_orang_tua'];
+$alamat_wali = $_POST['alamat_wali'];
+//$email = $_POST['email'];
+//$foto = $_POST['foto'];
+//$approve = $_POST['approve'];
+//$active = $_POST['active'];
+//$jenis_kelamin = $_POST['jenis_kelamin'];
+//$agama = $_POST['agama'];
+//$tgl_masuk = $_POST['tgl_masuk'];
+//$golongan_darah = $_POST['golongan_darah'];
+//$anak_ke = $_POST['anak_ke'];
+//$status_anak = $_POST['status_anak'];
+$di_kelas = $_POST['di_kelas'];
+$nama_sekolah_asal = $_POST['nama_sekolah_asal'];
+$alamat_sekolah_asal = $_POST['alamat_sekolah_asal'];
+
+//simpan data ke database
+//$query = mysql_query("insert into kelas values('$id', '$no_induk', '$kelas', '$anak_ke', '$nama', '$lahir', '$tgl', '$alamat', '$no_telepon', '$nama_ayah', '$nama_ibu', '$pekerjaan_ayah', '$pekerjaan_ibu', '$alamat_orang_tua','$angkatan', '$jenis_kelamin', '$no_telepon', '$nama_wali', '$nama_wali', '$pekerjaan_wali', '$alamat_wali', '$anak_ke', '$status_anak', '$di_kelas', '$nama_sekolah_asal', '$alamat_sekolah_asal', '$alamat_orang_tua', '$no_telepon_orang_tua')") or die(mysql_error());
+
+$query = mysql_query("insert into kelas values('no_induk', 'nama', 'jenis_kelamin', 'lahir', 'tgl', 'status_anak', 'anak_ke', 'alamat', 'kelas', 'angkatan', 'no_telepon', 'nama_ayah','nama_ibu','pekerjaan_ayah', 'pekerjaan_ibu', 'no_telepon_orang_tua', 'nama_wali', 'pekerjaan_wali', 'no_telepon_wali', 'alamat_orang_tua', 'alamat_wali', 'di_kelas', 'nama_sekolah_asal', 'alamat_sekolah_asal')") or die(mysql_error());
+
+if ($query) {
+	header('location:siswa.php?message=success');
+}
+?>
