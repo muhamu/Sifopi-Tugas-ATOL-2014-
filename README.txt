@@ -7,7 +7,7 @@ SIFOPI — Sistem Informasi Akademik SMK PI 52 Bandung Tugas ATOL 2014  ·  Dire
   untuk SMK Prakarya Internasional (SMK PI) 52 Bandung yang sempat
   terbengkalai selama bertahun-tahun.
 
-  Kini di-refactor ulang dari nol dengan teknologi modern.
+  Kini di-refactor ulang dari nol dengan php terbaru
 
 
   TENTANG PROYEK
