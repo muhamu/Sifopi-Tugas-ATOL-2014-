@@ -1,54 +1,60 @@
 <?php $pageTitle = 'Daftar Kelas'; $activePage = 'kelas'; ?>
 
-<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
-    <div>
-        <h1 class="page-title">Daftar Kelas</h1>
-        <p class="page-subtitle">Kelola data kelas sekolah</p>
+<div class="g-list-card">
+    <div class="g-list-header">
+        <h2 class="g-list-title">Rombongan Belajar (Kelas)</h2>
+        <?php if (in_array($_SESSION['user']['role'], ['ADMIN'])): ?>
+            <a href="/kelas/create" class="g1-btn g1-btn-primary" style="padding: 8px 16px; height: 36px; display: inline-flex; align-items: center;">+ Tambah Kelas</a>
+        <?php endif; ?>
     </div>
-    <?php if ($_SESSION['user']['role'] === 'ADMIN'): ?>
-        <a href="/kelas/create" class="btn btn-secondary">+ Tambah Kelas</a>
-    <?php endif; ?>
-</div>
 
-<?php
-$guruMap = [];
-foreach ($guru_list as $g) $guruMap[$g['id']] = $g['nama'];
-?>
-
-<?php if (!empty($result)): ?>
-    <div class="table-responsive">
-        <table class="table">
+    <div class="g-table-responsive">
+        <table class="g-table">
             <thead>
-                <tr><th>Nama Kelas</th><th>Ruangan</th><th>Wali Kelas</th><th>Kurikulum</th><th>Kapasitas</th><th>Status</th><th style="width:130px;">Aksi</th></tr>
+                <tr>
+                    <th>Tingkat</th>
+                    <th>Nama Kelas</th>
+                    <th>Wali Kelas</th>
+                    <th>Kapasitas</th>
+                    <?php if ($_SESSION['user']['role'] === 'ADMIN'): ?>
+                        <th style="text-align: right;">Aksi</th>
+                    <?php endif; ?>
+                </tr>
             </thead>
             <tbody>
-                <?php foreach ($result as $k): ?>
+                <?php if (empty($result)): ?>
                     <tr>
-                        <td><strong><?= safe($k['nama_kelas']) ?></strong></td>
-                        <td><?= safe($k['no_ruangan'] ?? '-') ?></td>
-                        <td><?= safe($guruMap[$k['id_guru_wali']] ?? '-') ?></td>
-                        <td><?= safe($k['kurikulum'] ?? '-') ?></td>
-                        <td><?= safe($k['capacity'] ?? 40) ?> siswa</td>
-                        <td><span class="badge badge-<?= $k['is_active'] ? 'success' : 'secondary' ?>"><?= $k['is_active'] ? 'Aktif' : 'Nonaktif' ?></span></td>
-                        <td class="table-actions">
-                            <?php if ($_SESSION['user']['role'] === 'ADMIN'): ?>
-                            <a href="/kelas/edit?id=<?= $k['id'] ?>" class="btn btn-small action-edit">Edit</a>
-                            <form method="POST" action="/kelas/delete?id=<?= $k['id'] ?>" style="display:inline;" onsubmit="return confirm('Nonaktifkan kelas <?= safe($k['nama_kelas']) ?>?')">
-                                <button class="btn btn-small action-delete">Hapus</button>
-                            </form>
-                            <?php endif; ?>
-                        </td>
+                        <td colspan="5" style="text-align: center; padding: 48px; color: #5f6368;"><i>Belum ada kelas yang terdaftar.</i></td>
                     </tr>
-                <?php endforeach; ?>
+                <?php else: ?>
+                    <?php foreach ($result as $row): ?>
+                        <tr>
+                            <td><span class="g-badge g-badge-info">Tingkat <?= safe($row['tingkat']) ?></span></td>
+                            <td style="font-weight: 500; color: #202124;"><?= safe($row['nama_kelas']) ?></td>
+                            <td><?= safe($row['wali_kelas_nama'] ?? 'Belum Ditentukan') ?></td>
+                            <td><?= safe($row['jumlah_siswa'] ?? '0') ?> Siswa</td>
+                            
+                            <?php if ($_SESSION['user']['role'] === 'ADMIN'): ?>
+                                <td style="text-align: right;">
+                                    <a href="/kelas/edit?id=<?= $row['id'] ?>" class="g-btn-icon" title="Edit">✎</a>
+                                    <form action="/kelas/delete?id=<?= $row['id'] ?>" method="POST" style="display:inline;" onsubmit="return confirm('Hapus kelas ini?');">
+                                        <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
+                                        <button type="submit" class="g-btn-icon delete" title="Hapus">🗑</button>
+                                    </form>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
-<?php else: ?>
-    <div class="empty-state">
-        <div class="empty-state-icon">🏫</div>
-        <h3 class="empty-state-title">Belum Ada Data Kelas</h3>
-        <?php if ($_SESSION['user']['role'] === 'ADMIN'): ?>
-            <a href="/kelas/create" class="btn btn-primary">+ Tambah Kelas</a>
-        <?php endif; ?>
+    
+    <?php if (isset($result['pages']) && $result['pages'] > 1): ?>
+    <div class="g-pagination">
+        <span>Hal <?= $result['page'] ?> dari <?= $result['pages'] ?></span>
+        <?php if ($result['has_prev']): ?><a href="?page=<?= $result['page'] - 1 ?>" class="g-pagination-btn">❮</a><?php endif; ?>
+        <?php if ($result['has_next']): ?><a href="?page=<?= $result['page'] + 1 ?>" class="g-pagination-btn">❯</a><?php endif; ?>
     </div>
-<?php endif; ?>
+    <?php endif; ?>
+</div>

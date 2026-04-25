@@ -1,77 +1,94 @@
 <?php $pageTitle = 'Daftar Siswa'; $activePage = 'siswa'; ?>
 
-<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
-    <div>
-        <h1 class="page-title">Daftar Siswa</h1>
-        <p class="page-subtitle">Kelola data siswa sekolah</p>
+<div class="g-list-card">
+    <div class="g-list-header" style="flex-wrap: wrap; gap: 16px;">
+        <h2 class="g-list-title">Data Siswa Aktif</h2>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <!-- Form Pencarian -->
+            <form action="/siswa" method="GET" style="margin: 0; display: flex; gap: 8px;">
+                <input type="text" name="search" class="g-input" placeholder="Cari nama / NIS..." value="<?= safe($search ?? '') ?>" style="height: 36px; min-height: 0; padding: 4px 16px; border-radius: 18px; border-color: #dadce0;">
+                <button type="submit" class="g1-btn g1-btn-outline" style="height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border-color: #dadce0; color: #5f6368;">Cari</button>
+            </form>
+            
+            <!-- Tombol Tambah (Hanya Admin & Tata Usaha) -->
+            <?php if (in_array($_SESSION['user']['role'], ['ADMIN', 'TATA_USAHA'])): ?>
+                <a href="/siswa/create" class="g1-btn g1-btn-primary" style="height: 36px; padding: 0 16px; display: inline-flex; align-items: center;">+ Tambah Siswa</a>
+            <?php endif; ?>
+        </div>
     </div>
-    <?php if (in_array($_SESSION['user']['role'], ['ADMIN','TATA_USAHA'])): ?>
-        <a href="/siswa/create" class="btn btn-secondary">+ Tambah Siswa</a>
-    <?php endif; ?>
-</div>
 
-<div class="search-bar">
-    <form method="GET" action="/siswa" style="display:flex;gap:8px;align-items:center;">
-        <input type="text" name="search" class="search-input" placeholder="Cari nama atau no induk..." value="<?= safe($search ?? '') ?>">
-        <button type="submit" class="btn btn-primary">Cari</button>
-        <?php if (!empty($search)): ?><a href="/siswa" class="btn btn-outline">Reset</a><?php endif; ?>
-    </form>
-</div>
-
-<?php if (!empty($result['data'])): ?>
-    <div class="table-responsive">
-        <table class="table">
+    <div class="g-table-responsive">
+        <table class="g-table">
             <thead>
                 <tr>
-                    <th>No Induk</th>
-                    <th>Nama</th>
+                    <th>NIS</th>
+                    <th>Nama Lengkap</th>
+                    <th>L/P</th>
                     <th>Kelas</th>
-                    <th>Email</th>
                     <th>Status</th>
-                    <th style="width:130px;">Aksi</th>
+                    <?php if (in_array($_SESSION['user']['role'], ['ADMIN', 'TATA_USAHA'])): ?>
+                        <th style="text-align: right;">Aksi</th>
+                    <?php endif; ?>
                 </tr>
             </thead>
             <tbody>
-                <?php
-                $kelasMap = [];
-                foreach ($kelas_list as $k) $kelasMap[$k['id']] = $k['nama_kelas'];
-                foreach ($result['data'] as $s):
-                ?>
+                <?php if (empty($result['data'])): ?>
                     <tr>
-                        <td><strong><?= safe($s['no_induk']) ?></strong></td>
-                        <td><?= safe($s['nama']) ?></td>
-                        <td><?= safe($kelasMap[$s['kelas_id']] ?? '-') ?></td>
-                        <td><?= safe($s['email'] ?? '-') ?></td>
-                        <td><span class="badge badge-<?= $s['status'] === 'AKTIF' ? 'success' : 'secondary' ?>"><?= safe($s['status']) ?></span></td>
-                        <td class="table-actions">
-                            <a href="/siswa/edit?id=<?= $s['id'] ?>" class="btn btn-small action-edit">Edit</a>
-                            <?php if ($_SESSION['user']['role'] === 'ADMIN'): ?>
-                            <form method="POST" action="/siswa/delete?id=<?= $s['id'] ?>" style="display:inline;" onsubmit="return confirm('Hapus siswa <?= safe($s['nama']) ?>?')">
-                                <button class="btn btn-small action-delete">Hapus</button>
-                            </form>
-                            <?php endif; ?>
+                        <td colspan="6" style="text-align: center; padding: 48px; color: #5f6368; font-size: 0.95rem;">
+                            <i>Tidak ada data siswa yang ditemukan.</i>
                         </td>
                     </tr>
-                <?php endforeach; ?>
+                <?php else: ?>
+                    <?php foreach ($result['data'] as $row): 
+                        // Mencari Nama Kelas
+                        $namaKelas = '-';
+                        foreach ($kelas_list as $k) {
+                            if ($k['id'] == $row['kelas_id']) {
+                                $namaKelas = $k['nama_kelas'];
+                                break;
+                            }
+                        }
+                        $jk = $row['jenis_kelamin'] === 'L' ? 'Laki-laki' : ($row['jenis_kelamin'] === 'P' ? 'Perempuan' : '-');
+                        $badgeClass = $row['status'] === 'AKTIF' ? 'g-badge-success' : 'g-badge-danger';
+                    ?>
+                        <tr>
+                            <td><?= safe($row['no_induk']) ?></td>
+                            <td style="font-weight: 500; color: #1a73e8;"><?= safe($row['nama']) ?></td>
+                            <td><?= safe($jk) ?></td>
+                            <td><?= safe($namaKelas) ?></td>
+                            <td><span class="g-badge <?= $badgeClass ?>"><?= safe($row['status']) ?></span></td>
+                            
+                            <?php if (in_array($_SESSION['user']['role'], ['ADMIN', 'TATA_USAHA'])): ?>
+                                <td style="text-align: right;">
+                                    <a href="/siswa/edit?id=<?= $row['id'] ?>" class="g-btn-icon" title="Edit Data">✎</a>
+                                    <?php if ($_SESSION['user']['role'] === 'ADMIN'): ?>
+                                        <form action="/siswa/delete?id=<?= $row['id'] ?>" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus permanen data siswa ini?');">
+                                            <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
+                                            <button type="submit" class="g-btn-icon delete" title="Hapus Data">🗑</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
+
+    <!-- Paginasi Ala Material -->
     <?php if ($result['pages'] > 1): ?>
-        <div class="pagination"><ul>
-            <?php if ($result['has_prev']): ?><li><a href="/siswa?page=<?= $result['page']-1 ?>&search=<?= urlencode($search??'') ?>">← Prev</a></li><?php endif; ?>
-            <?php for ($i = max(1,$result['page']-2); $i <= min($result['pages'],$result['page']+2); $i++): ?>
-                <li><?php if ($i===$result['page']): ?><span class="active"><?= $i ?></span><?php else: ?><a href="/siswa?page=<?= $i ?>&search=<?= urlencode($search??'') ?>"><?= $i ?></a><?php endif; ?></li>
-            <?php endfor; ?>
-            <?php if ($result['has_next']): ?><li><a href="/siswa?page=<?= $result['page']+1 ?>&search=<?= urlencode($search??'') ?>">Next →</a></li><?php endif; ?>
-        </ul></div>
-    <?php endif; ?>
-<?php else: ?>
-    <div class="empty-state">
-        <div class="empty-state-icon">📚</div>
-        <h3 class="empty-state-title">Belum Ada Data Siswa</h3>
-        <p class="empty-state-text"><?= !empty($search) ? "Tidak ditemukan untuk \"$search\"" : 'Mulai dengan menambahkan siswa baru' ?></p>
-        <?php if (in_array($_SESSION['user']['role'], ['ADMIN','TATA_USAHA'])): ?>
-            <a href="/siswa/create" class="btn btn-primary">+ Tambah Siswa</a>
-        <?php endif; ?>
+    <div class="g-pagination">
+        <span>Menampilkan halaman <?= $result['page'] ?> dari <?= $result['pages'] ?> (Total <?= $result['total'] ?> Siswa)</span>
+        <div style="display: flex; gap: 8px;">
+            <?php if ($result['has_prev']): ?>
+                <a href="?page=<?= $result['page'] - 1 ?><?= $search ? '&search='.urlencode($search) : '' ?>" class="g-pagination-btn" title="Halaman Sebelumnya">❮</a>
+            <?php endif; ?>
+            
+            <?php if ($result['has_next']): ?>
+                <a href="?page=<?= $result['page'] + 1 ?><?= $search ? '&search='.urlencode($search) : '' ?>" class="g-pagination-btn" title="Halaman Selanjutnya">❯</a>
+            <?php endif; ?>
+        </div>
     </div>
-<?php endif; ?>
+    <?php endif; ?>
+</div>

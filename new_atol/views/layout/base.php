@@ -23,6 +23,9 @@
     <nav class="navbar">
         <div class="navbar-container">
             <div class="navbar-brand">
+                <?php if (isset($_SESSION['user'])): ?>
+                    <button id="sidebar-toggle" class="mobile-toggle">☰</button>
+                <?php endif; ?>
                 <h1 class="navbar-title">SMK PI</h1>
             </div>
             <div class="navbar-menu">
@@ -44,31 +47,31 @@
             <aside class="sidebar">
                 <nav class="sidebar-nav">
                     <ul>
-                        <li><a href="/dashboard" class="nav-link <?= $activePage === 'dashboard' ? 'active' : '' ?>">Dashboard</a></li>
+                        <li><a href="/dashboard" class="nav-link <?= ($activePage ?? '') === 'dashboard' ? 'active' : '' ?>">⌂ Dashboard</a></li>
 
                         <?php if (in_array($_SESSION['user']['role'], ['ADMIN', 'GURU', 'TATA_USAHA'])): ?>
                             <li class="nav-section">Data Akademik</li>
-                            <li><a href="/siswa" class="nav-link <?= $activePage === 'siswa' ? 'active' : '' ?>">Siswa</a></li>
-                            <li><a href="/guru" class="nav-link <?= $activePage === 'guru' ? 'active' : '' ?>">Guru</a></li>
-                            <li><a href="/kelas" class="nav-link <?= $activePage === 'kelas' ? 'active' : '' ?>">Kelas</a></li>
-                            <li><a href="/mapel" class="nav-link <?= $activePage === 'mapel' ? 'active' : '' ?>">Mata Pelajaran</a></li>
+                            <li><a href="/siswa" class="nav-link <?= ($activePage ?? '') === 'siswa' ? 'active' : '' ?>">👤 Siswa</a></li>
+                            <li><a href="/guru" class="nav-link <?= ($activePage ?? '') === 'guru' ? 'active' : '' ?>">👨‍🏫 Guru</a></li>
+                            <li><a href="/kelas" class="nav-link <?= ($activePage ?? '') === 'kelas' ? 'active' : '' ?>">🏫 Kelas</a></li>
+                            <li><a href="/mapel" class="nav-link <?= ($activePage ?? '') === 'mapel' ? 'active' : '' ?>">📚 Mata Pelajaran</a></li>
                         <?php endif; ?>
 
                         <?php if (in_array($_SESSION['user']['role'], ['ADMIN', 'GURU', 'SISWA'])): ?>
                             <li class="nav-section">Akademik</li>
-                            <li><a href="/nilai" class="nav-link <?= $activePage === 'nilai' ? 'active' : '' ?>">Nilai</a></li>
-                            <li><a href="/absen" class="nav-link <?= $activePage === 'absen' ? 'active' : '' ?>">Absensi</a></li>
-                            <li><a href="/jadwal" class="nav-link <?= $activePage === 'jadwal' ? 'active' : '' ?>">Jadwal</a></li>
+                            <li><a href="/nilai" class="nav-link <?= ($activePage ?? '') === 'nilai' ? 'active' : '' ?>">📝 Nilai</a></li>
+                            <li><a href="/absen" class="nav-link <?= ($activePage ?? '') === 'absen' ? 'active' : '' ?>">✓ Absensi</a></li>
+                            <li><a href="/jadwal" class="nav-link <?= ($activePage ?? '') === 'jadwal' ? 'active' : '' ?>">📅 Jadwal</a></li>
                         <?php endif; ?>
 
                         <?php if (in_array($_SESSION['user']['role'], ['ADMIN', 'TATA_USAHA'])): ?>
                             <li class="nav-section">Keuangan</li>
-                            <li><a href="/iuran" class="nav-link <?= $activePage === 'iuran' ? 'active' : '' ?>">SPP/Iuran</a></li>
-                            <li><a href="/pembayaran-lain" class="nav-link">Pembayaran Lain</a></li>
+                            <li><a href="/iuran" class="nav-link <?= ($activePage ?? '') === 'iuran' ? 'active' : '' ?>">💰 SPP/Iuran</a></li>
+                            <li><a href="/pembayaran-lain" class="nav-link <?= ($activePage ?? '') === 'pembayaran-lain' ? 'active' : '' ?>">💳 Pembayaran Lain</a></li>
                         <?php endif; ?>
 
                         <li class="nav-section">Lainnya</li>
-                        <li><a href="/profile" class="nav-link <?= $activePage === 'profile' ? 'active' : '' ?>">Profile</a></li>
+                        <li><a href="/profile" class="nav-link <?= ($activePage ?? '') === 'profile' ? 'active' : '' ?>">⚙ Profile</a></li>
                     </ul>
                 </nav>
             </aside>

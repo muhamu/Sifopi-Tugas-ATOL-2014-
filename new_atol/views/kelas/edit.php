@@ -1,48 +1,44 @@
 <?php $pageTitle = 'Edit Kelas'; $activePage = 'kelas'; ?>
 
-<div class="page-header">
-    <h1 class="page-title">Edit Kelas</h1>
-    <p class="page-subtitle"><?= safe($kelas['nama_kelas']) ?></p>
-</div>
+<div class="g-form-card">
+    <div class="g-form-header">
+        <h1 class="g-form-title">Edit Rombongan Belajar</h1>
+        <p class="g-form-subtitle">Perbarui informasi kelas <strong><?= safe($kelas['nama_kelas']) ?></strong>.</p>
+    </div>
 
-<div class="card">
-    <div class="card-body">
-        <form method="POST" action="/kelas/edit?id=<?= $kelas['id'] ?>" class="form-row">
-            <div class="form-group">
-                <label for="nama_kelas">Nama Kelas *</label>
-                <input type="text" id="nama_kelas" name="nama_kelas" required value="<?= safe($kelas['nama_kelas']) ?>">
+    <form action="/kelas/update?id=<?= $kelas['id'] ?>" method="POST">
+        <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
+
+        <div class="g-form-grid">
+            <div class="g-form-group">
+                <input type="text" id="nama_kelas" name="nama_kelas" class="g-input" placeholder=" " value="<?= safe($kelas['nama_kelas'] ?? '') ?>" data-validate="required">
+                <label for="nama_kelas" class="g-label">Nama Kelas (cth: RPL 1)</label>
             </div>
-            <div class="form-group">
-                <label for="no_ruangan">No. Ruangan</label>
-                <input type="text" id="no_ruangan" name="no_ruangan" value="<?= safe($kelas['no_ruangan'] ?? '') ?>">
+            
+            <div class="g-form-group">
+                <input type="text" id="no_ruangan" name="no_ruangan" class="g-input" placeholder=" " value="<?= safe($kelas['no_ruangan'] ?? '') ?>">
+                <label for="no_ruangan" class="g-label">No. Ruangan (Opsional)</label>
             </div>
-            <div class="form-group">
-                <label for="id_guru_wali">Wali Kelas</label>
-                <select id="id_guru_wali" name="id_guru_wali">
-                    <option value="">-- Pilih Guru --</option>
-                    <?php foreach ($guru_list as $g): ?>
-                        <option value="<?= $g['id'] ?>" <?= $g['id'] == $kelas['id_guru_wali'] ? 'selected' : '' ?>><?= safe($g['nama']) ?></option>
+
+            <div class="g-form-group full-width">
+                <select id="id_guru_wali" name="id_guru_wali" class="g-input" required>
+                    <option value="" disabled></option>
+                    <?php foreach ($guru_list ?? [] as $guru): ?>
+                        <option value="<?= $guru['id'] ?>" <?= ($guru['id'] == $kelas['id_guru_wali']) ? 'selected' : '' ?>><?= safe($guru['nama']) ?></option>
                     <?php endforeach; ?>
                 </select>
+                <label for="id_guru_wali" class="g-label">Pilih Wali Kelas</label>
             </div>
-            <div class="form-group">
-                <label for="kurikulum">Kurikulum</label>
-                <input type="text" id="kurikulum" name="kurikulum" value="<?= safe($kelas['kurikulum'] ?? '') ?>">
+
+            <div class="g-form-group full-width">
+                <input type="number" id="capacity" name="capacity" class="g-input" placeholder=" " value="<?= safe($kelas['capacity'] ?? '40') ?>" data-validate="required,number">
+                <label for="capacity" class="g-label">Kapasitas Maksimal Siswa</label>
             </div>
-            <div class="form-group">
-                <label for="capacity">Kapasitas</label>
-                <input type="number" id="capacity" name="capacity" min="1" max="50" value="<?= safe($kelas['capacity'] ?? 40) ?>">
-            </div>
-            <div class="form-group">
-                <label>Status</label>
-                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                    <input type="checkbox" name="is_active" value="1" <?= $kelas['is_active'] ? 'checked' : '' ?>> Aktif
-                </label>
-            </div>
-            <div class="form-actions" style="grid-column:1/-1;">
-                <a href="/kelas" class="btn btn-outline">Batal</a>
-                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-            </div>
-        </form>
-    </div>
+        </div>
+
+        <div class="g-form-actions">
+            <a href="/kelas" class="g1-btn g1-btn-outline">Batal</a>
+            <button type="submit" class="g1-btn g1-btn-primary">Simpan Perubahan</button>
+        </div>
+    </form>
 </div>

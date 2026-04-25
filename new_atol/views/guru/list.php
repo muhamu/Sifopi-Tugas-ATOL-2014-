@@ -1,65 +1,73 @@
 <?php $pageTitle = 'Daftar Guru'; $activePage = 'guru'; ?>
 
-<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
-    <div>
-        <h1 class="page-title">Daftar Guru</h1>
-        <p class="page-subtitle">Kelola data guru sekolah</p>
+<div class="g-list-card">
+    <div class="g-list-header" style="flex-wrap: wrap; gap: 16px;">
+        <h2 class="g-list-title">Tenaga Pengajar Aktif</h2>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <form action="/guru" method="GET" style="margin: 0; display: flex; gap: 8px;">
+                <input type="text" name="search" class="g-input" placeholder="Cari nama / NIP..." value="<?= safe($search ?? '') ?>" style="height: 36px; min-height: 0; padding: 4px 16px; border-radius: 18px; border-color: #dadce0;">
+                <button type="submit" class="g1-btn g1-btn-outline" style="height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border-color: #dadce0; color: #5f6368;">Cari</button>
+            </form>
+            
+            <?php if (in_array($_SESSION['user']['role'], ['ADMIN', 'TATA_USAHA'])): ?>
+                <a href="/guru/create" class="g1-btn g1-btn-primary" style="height: 36px; padding: 0 16px; display: inline-flex; align-items: center;">+ Tambah Guru</a>
+            <?php endif; ?>
+        </div>
     </div>
-    <?php if ($_SESSION['user']['role'] === 'ADMIN'): ?>
-        <a href="/guru/create" class="btn btn-secondary">+ Tambah Guru</a>
-    <?php endif; ?>
-</div>
 
-<div class="search-bar">
-    <form method="GET" action="/guru" style="display:flex;gap:8px;align-items:center;">
-        <input type="text" name="search" class="search-input" placeholder="Cari nama atau NIP..." value="<?= safe($search ?? '') ?>">
-        <button type="submit" class="btn btn-primary">Cari</button>
-        <?php if (!empty($search)): ?><a href="/guru" class="btn btn-outline">Reset</a><?php endif; ?>
-    </form>
-</div>
-
-<?php if (!empty($result['data'])): ?>
-    <div class="table-responsive">
-        <table class="table">
+    <div class="g-table-responsive">
+        <table class="g-table">
             <thead>
-                <tr><th>NIP</th><th>Nama</th><th>Email</th><th>No. Telepon</th><th>Status</th><th style="width:130px;">Aksi</th></tr>
+                <tr>
+                    <th>NIP/NIK</th>
+                    <th>Nama Lengkap</th>
+                    <th>L/P</th>
+                    <th>No. Telepon</th>
+                    <th>Bidang Studi</th>
+                    <?php if (in_array($_SESSION['user']['role'], ['ADMIN', 'TATA_USAHA'])): ?>
+                        <th style="text-align: right;">Aksi</th>
+                    <?php endif; ?>
+                </tr>
             </thead>
             <tbody>
-                <?php foreach ($result['data'] as $g): ?>
+                <?php if (empty($result['data'])): ?>
                     <tr>
-                        <td><strong><?= safe($g['nip'] ?? '-') ?></strong></td>
-                        <td><?= safe($g['nama']) ?></td>
-                        <td><?= safe($g['email'] ?? '-') ?></td>
-                        <td><?= safe($g['no_telepon'] ?? '-') ?></td>
-                        <td><span class="badge badge-<?= ($g['status'] ?? '') === 'AKTIF' ? 'success' : 'secondary' ?>"><?= safe($g['status'] ?? 'AKTIF') ?></span></td>
-                        <td class="table-actions">
-                            <?php if ($_SESSION['user']['role'] === 'ADMIN'): ?>
-                            <a href="/guru/edit?id=<?= $g['id'] ?>" class="btn btn-small action-edit">Edit</a>
-                            <form method="POST" action="/guru/delete?id=<?= $g['id'] ?>" style="display:inline;" onsubmit="return confirm('Hapus guru <?= safe($g['nama']) ?>?')">
-                                <button class="btn btn-small action-delete">Hapus</button>
-                            </form>
-                            <?php endif; ?>
+                        <td colspan="6" style="text-align: center; padding: 48px; color: #5f6368; font-size: 0.95rem;">
+                            <i>Tidak ada data tenaga pengajar.</i>
                         </td>
                     </tr>
-                <?php endforeach; ?>
+                <?php else: ?>
+                    <?php foreach ($result['data'] as $row): ?>
+                        <tr>
+                            <td><?= safe($row['nip']) ?></td>
+                            <td style="font-weight: 500; color: #1a73e8;"><div style="display:flex; align-items:center; gap:8px;"><div class="g1-dot green"></div><?= safe($row['nama']) ?></div></td>
+                            <td><?= safe($row['jenis_kelamin'] === 'L' ? 'Laki-laki' : 'Perempuan') ?></td>
+                            <td><?= safe($row['no_telepon']) ?></td>
+                            <td><?= safe($row['bidang_studi']) ?></td>
+                            
+                            <?php if (in_array($_SESSION['user']['role'], ['ADMIN', 'TATA_USAHA'])): ?>
+                                <td style="text-align: right;">
+                                    <a href="/guru/edit?id=<?= $row['id'] ?>" class="g-btn-icon" title="Edit">✎</a>
+                                    <form action="/guru/delete?id=<?= $row['id'] ?>" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?');">
+                                        <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
+                                        <button type="submit" class="g-btn-icon delete" title="Hapus">🗑</button>
+                                    </form>
+                                </td>
+                            <?php endif; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
-    <?php if ($result['pages'] > 1): ?>
-        <div class="pagination"><ul>
-            <?php if ($result['has_prev']): ?><li><a href="/guru?page=<?= $result['page']-1 ?>">← Prev</a></li><?php endif; ?>
-            <?php for ($i = max(1,$result['page']-2); $i <= min($result['pages'],$result['page']+2); $i++): ?>
-                <li><?php if ($i===$result['page']): ?><span class="active"><?= $i ?></span><?php else: ?><a href="/guru?page=<?= $i ?>"><?= $i ?></a><?php endif; ?></li>
-            <?php endfor; ?>
-            <?php if ($result['has_next']): ?><li><a href="/guru?page=<?= $result['page']+1 ?>">Next →</a></li><?php endif; ?>
-        </ul></div>
-    <?php endif; ?>
-<?php else: ?>
-    <div class="empty-state">
-        <div class="empty-state-icon">👨‍🏫</div>
-        <h3 class="empty-state-title">Belum Ada Data Guru</h3>
-        <?php if ($_SESSION['user']['role'] === 'ADMIN'): ?>
-            <a href="/guru/create" class="btn btn-primary">+ Tambah Guru</a>
-        <?php endif; ?>
+
+    <?php if (isset($result['pages']) && $result['pages'] > 1): ?>
+    <div class="g-pagination">
+        <span>Hal <?= $result['page'] ?> dari <?= $result['pages'] ?></span>
+        <div style="display: flex; gap: 8px;">
+            <?php if ($result['has_prev']): ?><a href="?page=<?= $result['page'] - 1 ?>&search=<?= urlencode($search ?? '') ?>" class="g-pagination-btn">❮</a><?php endif; ?>
+            <?php if ($result['has_next']): ?><a href="?page=<?= $result['page'] + 1 ?>&search=<?= urlencode($search ?? '') ?>" class="g-pagination-btn">❯</a><?php endif; ?>
+        </div>
     </div>
-<?php endif; ?>
+    <?php endif; ?>
+</div>

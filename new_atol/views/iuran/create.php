@@ -1,68 +1,57 @@
-<?php $pageTitle = 'Tambah Tagihan SPP'; $activePage = 'iuran';
-$bulanNama = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
-?>
+<?php $pageTitle = 'Buat Tagihan SPP'; $activePage = 'iuran'; ?>
 
-<div class="page-header">
-    <h1 class="page-title">Tambah Tagihan SPP</h1>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <form method="POST" action="/iuran/create" class="form-row">
-            <div class="form-group">
-                <label for="siswa_id">Siswa *</label>
-                <select id="siswa_id" name="siswa_id" required>
-                    <option value="">-- Pilih Siswa --</option>
-                    <?php foreach ($siswa_list as $s): ?>
-                        <option value="<?= $s['id'] ?>"><?= safe($s['nama']) ?> (<?= safe($s['no_induk']) ?>)</option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="bulan">Bulan *</label>
-                <select id="bulan" name="bulan" required>
-                    <?php foreach ($bulanNama as $num => $nama): ?>
-                        <option value="<?= $num ?>" <?= $num == date('n') ? 'selected' : '' ?>><?= $nama ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="tahun">Tahun *</label>
-                <input type="number" id="tahun" name="tahun" required min="2020" max="2030" value="<?= date('Y') ?>">
-            </div>
-            <div class="form-group">
-                <label for="nominal">Nominal (Rp) *</label>
-                <input type="number" id="nominal" name="nominal" required min="0" step="1000" placeholder="Contoh: 150000">
-            </div>
-            <div class="form-group">
-                <label for="status">Status Pembayaran</label>
-                <select id="status" name="status">
-                    <?php foreach (PAYMENT_STATUS as $v => $l): ?>
-                        <option value="<?= $v ?>"><?= $l ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="tanggal_bayar">Tanggal Bayar</label>
-                <input type="date" id="tanggal_bayar" name="tanggal_bayar">
-            </div>
-            <div class="form-group">
-                <label for="metode_bayar">Metode Bayar</label>
-                <select id="metode_bayar" name="metode_bayar">
-                    <option value="">-- Pilih --</option>
-                    <?php foreach (['Tunai','Transfer Bank','QRIS','Kartu Debit'] as $m): ?>
-                        <option value="<?= $m ?>"><?= $m ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="catatan">Catatan</label>
-                <input type="text" id="catatan" name="catatan" placeholder="Opsional">
-            </div>
-            <div class="form-actions" style="grid-column:1/-1;">
-                <a href="/iuran" class="btn btn-outline">Batal</a>
-                <button type="submit" class="btn btn-primary">Simpan</button>
-            </div>
-        </form>
+<div class="g-form-card">
+    <div class="g-form-header">
+        <h1 class="g-form-title">Terbitkan Tagihan SPP</h1>
+        <p class="g-form-subtitle">Buat tagihan SPP bulanan baru untuk siswa yang terdaftar.</p>
     </div>
+
+    <form action="/iuran/store" method="POST">
+        <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
+
+        <div class="g-form-grid">
+            <div class="g-form-group full-width">
+                <select id="siswa_id" name="siswa_id" class="g-input" data-validate="required" required>
+                    <option value="" disabled selected></option>
+                    <?php foreach ($siswa_list ?? [] as $siswa): ?>
+                        <option value="<?= $siswa['id'] ?>"><?= safe($siswa['nama']) ?> (NIS: <?= safe($siswa['no_induk']) ?>)</option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="siswa_id" class="g-label">Pilih Siswa</label>
+            </div>
+
+            <div class="g-form-group">
+                <select id="bulan" name="bulan" class="g-input" required>
+                    <option value="" disabled selected></option>
+                    <?php for($i=1; $i<=12; $i++): ?>
+                        <option value="<?= $i ?>"><?= date('F', mktime(0, 0, 0, $i, 10)) ?></option>
+                    <?php endfor; ?>
+                </select>
+                <label for="bulan" class="g-label">Periode Bulan</label>
+            </div>
+
+            <div class="g-form-group">
+                <input type="number" id="tahun" name="tahun" class="g-input" placeholder=" " value="<?= date('Y') ?>" data-validate="required,number">
+                <label for="tahun" class="g-label">Tahun</label>
+            </div>
+
+            <div class="g-form-group">
+                <input type="number" id="nominal" name="nominal" class="g-input" placeholder=" " data-validate="required,number">
+                <label for="nominal" class="g-label">Nominal Tagihan (Rp)</label>
+            </div>
+
+            <div class="g-form-group">
+                <select id="status" name="status" class="g-input" required>
+                    <option value="BELUM_LUNAS" selected>Belum Lunas</option>
+                    <option value="LUNAS">Lunas</option>
+                </select>
+                <label for="status" class="g-label">Status Pembayaran</label>
+            </div>
+        </div>
+
+        <div class="g-form-actions">
+            <a href="/iuran" class="g1-btn g1-btn-outline">Batal</a>
+            <button type="submit" class="g1-btn g1-btn-primary">Terbitkan Tagihan</button>
+        </div>
+    </form>
 </div>

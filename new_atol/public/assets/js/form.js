@@ -95,7 +95,7 @@ const FormUtils = (() => {
 
     // Show field error
     const showFieldError = (input, message, showError = true) => {
-        const container = input.closest('.form-group');
+        const container = input.closest('.form-group, .g-form-group');
         if (!container) return;
 
         // Remove existing error message
@@ -139,6 +139,11 @@ const FormUtils = (() => {
             // Validate on blur
             input.addEventListener('blur', () => {
                 validateField(input);
+            });
+            
+            // Clear validation error on focus/input to keep it clean
+            input.addEventListener('focus', () => {
+                input.classList.remove('is-invalid');
             });
 
             // Clear error on input

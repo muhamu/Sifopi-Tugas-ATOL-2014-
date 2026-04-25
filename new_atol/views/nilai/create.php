@@ -1,77 +1,71 @@
-<?php $pageTitle = 'Input Nilai'; $activePage = 'nilai'; ?>
+<?php $pageTitle = 'Input Nilai Siswa'; $activePage = 'nilai'; ?>
 
-<div class="page-header">
-    <h1 class="page-title">Input Nilai Siswa</h1>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <form method="POST" action="/nilai/create" class="form-row">
-            <div class="form-group">
-                <label for="siswa_id">Siswa *</label>
-                <select id="siswa_id" name="siswa_id" required>
-                    <option value="">-- Pilih Siswa --</option>
-                    <?php foreach ($siswa_list as $s): ?>
-                        <option value="<?= $s['id'] ?>"><?= safe($s['nama']) ?> (<?= safe($s['no_induk']) ?>)</option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="pelajaran_kelas_id">Mata Pelajaran & Kelas *</label>
-                <select id="pelajaran_kelas_id" name="pelajaran_kelas_id" required>
-                    <option value="">-- Pilih --</option>
-                    <?php foreach ($pk_list as $pk): ?>
-                        <option value="<?= $pk['id'] ?>"><?= safe($pk['mata_pelajaran']) ?> — <?= safe($pk['nama_kelas']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="tahun_ajaran_id">Tahun Ajaran</label>
-                <select id="tahun_ajaran_id" name="tahun_ajaran_id">
-                    <?php foreach ($tahun_list as $t): ?>
-                        <option value="<?= $t['id'] ?>" <?= $t['is_active'] ? 'selected' : '' ?>><?= safe($t['tahun_ajaran']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="semester">Semester</label>
-                <select id="semester" name="semester">
-                    <option value="1">Semester 1</option>
-                    <option value="2">Semester 2</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="tugas">Nilai Tugas (0–100)</label>
-                <input type="number" id="tugas" name="tugas" min="0" max="100" step="0.5" value="0">
-            </div>
-            <div class="form-group">
-                <label for="uts">Nilai UTS (0–100)</label>
-                <input type="number" id="uts" name="uts" min="0" max="100" step="0.5" value="0">
-            </div>
-            <div class="form-group">
-                <label for="uas">Nilai UAS (0–100)</label>
-                <input type="number" id="uas" name="uas" min="0" max="100" step="0.5" value="0">
-            </div>
-            <div class="form-group">
-                <label>Rata-rata (otomatis)</label>
-                <input type="text" id="preview_rata" disabled placeholder="Dihitung otomatis">
-            </div>
-            <div class="form-actions" style="grid-column:1/-1;">
-                <a href="/nilai" class="btn btn-outline">Batal</a>
-                <button type="submit" class="btn btn-primary">Simpan Nilai</button>
-            </div>
-        </form>
+<div class="g-form-card">
+    <div class="g-form-header">
+        <h1 class="g-form-title">Input Nilai Akademik</h1>
+        <p class="g-form-subtitle">Masukkan nilai Tugas, UTS, dan UAS siswa untuk mata pelajaran tertentu.</p>
     </div>
+
+    <form action="/nilai/store" method="POST">
+        <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
+
+        <div class="g-form-grid">
+            <div class="g-form-group full-width">
+                <select id="siswa_id" name="siswa_id" class="g-input" data-validate="required" required>
+                    <option value="" disabled selected></option>
+                    <?php foreach ($siswa_list ?? [] as $siswa): ?>
+                        <option value="<?= $siswa['id'] ?>"><?= safe($siswa['nama']) ?> (NIS: <?= safe($siswa['no_induk']) ?>)</option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="siswa_id" class="g-label">Pilih Siswa</label>
+            </div>
+
+            <div class="g-form-group full-width">
+                <select id="pelajaran_kelas_id" name="pelajaran_kelas_id" class="g-input" data-validate="required" required>
+                    <option value="" disabled selected></option>
+                    <?php foreach ($pk_list ?? [] as $pk): ?>
+                        <option value="<?= $pk['id'] ?>"><?= safe($pk['mata_pelajaran']) ?> - Kelas <?= safe($pk['nama_kelas']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="pelajaran_kelas_id" class="g-label">Mata Pelajaran & Kelas</label>
+            </div>
+
+            <div class="g-form-group">
+                <select id="tahun_ajaran_id" name="tahun_ajaran_id" class="g-input" required>
+                    <?php foreach ($tahun_list ?? [] as $tahun): ?>
+                        <option value="<?= $tahun['id'] ?>"><?= safe($tahun['tahun']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="tahun_ajaran_id" class="g-label">Tahun Ajaran</label>
+            </div>
+
+            <div class="g-form-group">
+                <select id="semester" name="semester" class="g-input" required>
+                    <option value="1">Ganjil (1)</option>
+                    <option value="2">Genap (2)</option>
+                </select>
+                <label for="semester" class="g-label">Semester</label>
+            </div>
+
+            <div class="g-form-group">
+                <input type="number" id="tugas" name="tugas" class="g-input" placeholder=" " value="0" min="0" max="100" data-validate="required,number">
+                <label for="tugas" class="g-label">Nilai Tugas</label>
+            </div>
+
+            <div class="g-form-group">
+                <input type="number" id="uts" name="uts" class="g-input" placeholder=" " value="0" min="0" max="100" data-validate="required,number">
+                <label for="uts" class="g-label">Nilai UTS</label>
+            </div>
+
+            <div class="g-form-group">
+                <input type="number" id="uas" name="uas" class="g-input" placeholder=" " value="0" min="0" max="100" data-validate="required,number">
+                <label for="uas" class="g-label">Nilai UAS</label>
+            </div>
+        </div>
+
+        <div class="g-form-actions">
+            <a href="/nilai" class="g1-btn g1-btn-outline">Batal</a>
+            <button type="submit" class="g1-btn g1-btn-primary">Simpan Nilai</button>
+        </div>
+    </form>
 </div>
-<script>
-['tugas','uts','uas'].forEach(id => {
-    document.getElementById(id).addEventListener('input', () => {
-        const t = parseFloat(document.getElementById('tugas').value)||0;
-        const u = parseFloat(document.getElementById('uts').value)||0;
-        const a = parseFloat(document.getElementById('uas').value)||0;
-        const avg = ((t+u+a)/3).toFixed(2);
-        const grade = avg>=90?'A':avg>=80?'B':avg>=70?'C':avg>=60?'D':'E';
-        document.getElementById('preview_rata').value = avg + ' (' + grade + ')';
-    });
-});
-</script>

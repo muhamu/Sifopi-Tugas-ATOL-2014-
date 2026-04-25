@@ -10,17 +10,17 @@
     <?php endif; ?>
 </div>
 
-<div class="search-bar">
+<div class="search-bar" style="margin-bottom: 24px;">
     <form method="GET" action="/absen" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <input type="date" name="tanggal" value="<?= safe($tanggal ?? '') ?>" class="search-input" style="max-width:180px;">
-        <select name="kelas_id" class="search-input" style="max-width:200px;">
+        <input type="date" name="tanggal" value="<?= safe($tanggal ?? '') ?>" class="g-input" style="height: 36px; min-height: 0; padding: 4px 16px; border-radius: 18px; border-color: #dadce0; max-width: 180px;">
+        <select name="kelas_id" class="g-input" style="height: 36px; min-height: 0; padding: 4px 32px 4px 16px; border-radius: 18px; border-color: #dadce0; max-width: 200px;">
             <option value="">Semua Kelas</option>
             <?php foreach ($kelas_list as $k): ?>
                 <option value="<?= $k['id'] ?>" <?= ($kelas_id ?? 0) == $k['id'] ? 'selected' : '' ?>><?= safe($k['nama_kelas']) ?></option>
             <?php endforeach; ?>
         </select>
-        <button type="submit" class="btn btn-primary">Filter</button>
-        <a href="/absen" class="btn btn-outline">Reset</a>
+        <button type="submit" class="g1-btn g1-btn-primary" style="height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border: none;">Filter</button>
+        <a href="/absen" class="g1-btn g1-btn-outline" style="height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border-color: #dadce0; color: #5f6368;">Reset</a>
     </form>
 </div>
 

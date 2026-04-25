@@ -53,21 +53,10 @@ const SIFOPI = (() => {
     // Notification/Toast System
     const notify = (message, type = 'info', duration = 5000) => {
         const toast = document.createElement('div');
-        toast.className = `toast alert-${type} animate-slide-in`;
+        toast.className = `toast alert-${type}`;
         toast.textContent = message;
         toast.setAttribute('role', 'status');
         toast.setAttribute('aria-live', 'polite');
-
-        // Add some style
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            max-width: 400px;
-            z-index: 10000;
-            padding: 16px;
-            border-radius: 6px;
-        `;
 
         document.body.appendChild(toast);
 
@@ -90,7 +79,7 @@ const SIFOPI = (() => {
             modal.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2 class="modal-title">Konfirmasi</h2>
+                        <h2 class="modal-title">⚠ Konfirmasi</h2>
                     </div>
                     <div class="modal-body">
                         <p>${message}</p>
@@ -251,6 +240,14 @@ const SIFOPI = (() => {
             console.error('Global Error:', event.error);
             notify('Terjadi kesalahan', 'error');
         });
+
+        // Setup mobile sidebar toggle
+        const sidebarToggle = $('#sidebar-toggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                $('.sidebar').classList.toggle('show');
+            });
+        }
 
         // Setup unhandled promise rejection handler
         window.addEventListener('unhandledrejection', (event) => {

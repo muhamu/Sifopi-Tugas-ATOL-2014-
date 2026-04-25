@@ -50,47 +50,47 @@ class Router {
                 // Siswa
                 'GET:/siswa'           => $this->siswaList(),
                 'GET:/siswa/create'    => $this->siswaCreateForm(),
-                'POST:/siswa/create'   => $this->siswaCreate(),
+                'POST:/siswa/store'    => $this->siswaCreate(),
                 'GET:/siswa/edit'      => $this->siswaEditForm(),
-                'POST:/siswa/edit'     => $this->siswaEdit(),
+                'POST:/siswa/update'   => $this->siswaEdit(),
                 'POST:/siswa/delete'   => $this->siswaDelete(),
 
                 // Guru
                 'GET:/guru'            => $this->guruList(),
                 'GET:/guru/create'     => $this->guruCreateForm(),
-                'POST:/guru/create'    => $this->guruCreate(),
+                'POST:/guru/store'     => $this->guruCreate(),
                 'GET:/guru/edit'       => $this->guruEditForm(),
-                'POST:/guru/edit'      => $this->guruEdit(),
+                'POST:/guru/update'    => $this->guruEdit(),
                 'POST:/guru/delete'    => $this->guruDelete(),
 
                 // Kelas
                 'GET:/kelas'           => $this->kelasList(),
                 'GET:/kelas/create'    => $this->kelasCreateForm(),
-                'POST:/kelas/create'   => $this->kelasCreate(),
+                'POST:/kelas/store'    => $this->kelasCreate(),
                 'GET:/kelas/edit'      => $this->kelasEditForm(),
-                'POST:/kelas/edit'     => $this->kelasEdit(),
+                'POST:/kelas/update'   => $this->kelasEdit(),
                 'POST:/kelas/delete'   => $this->kelasDelete(),
 
                 // Mapel
                 'GET:/mapel'           => $this->mapelList(),
                 'GET:/mapel/create'    => $this->mapelCreateForm(),
-                'POST:/mapel/create'   => $this->mapelCreate(),
+                'POST:/mapel/store'    => $this->mapelCreate(),
                 'GET:/mapel/edit'      => $this->mapelEditForm(),
-                'POST:/mapel/edit'     => $this->mapelEdit(),
+                'POST:/mapel/update'   => $this->mapelEdit(),
                 'POST:/mapel/delete'   => $this->mapelDelete(),
 
                 // Nilai
                 'GET:/nilai'           => $this->nilaiList(),
                 'GET:/nilai/create'    => $this->nilaiCreateForm(),
-                'POST:/nilai/create'   => $this->nilaiCreate(),
+                'POST:/nilai/store'    => $this->nilaiCreate(),
                 'GET:/nilai/edit'      => $this->nilaiEditForm(),
-                'POST:/nilai/edit'     => $this->nilaiEdit(),
+                'POST:/nilai/update'   => $this->nilaiEdit(),
                 'POST:/nilai/delete'   => $this->nilaiDelete(),
 
                 // Absen
                 'GET:/absen'           => $this->absenList(),
                 'GET:/absen/create'    => $this->absenCreateForm(),
-                'POST:/absen/create'   => $this->absenCreate(),
+                'POST:/absen/store'    => $this->absenCreate(),
                 'POST:/absen/delete'   => $this->absenDelete(),
 
                 // Jadwal
@@ -99,14 +99,25 @@ class Router {
                 // Iuran/SPP
                 'GET:/iuran'           => $this->iuranList(),
                 'GET:/iuran/create'    => $this->iuranCreateForm(),
-                'POST:/iuran/create'   => $this->iuranCreate(),
+                'POST:/iuran/store'    => $this->iuranCreate(),
                 'GET:/iuran/edit'      => $this->iuranEditForm(),
-                'POST:/iuran/edit'     => $this->iuranEdit(),
+                'POST:/iuran/update'   => $this->iuranEdit(),
                 'POST:/iuran/delete'   => $this->iuranDelete(),
+                'GET:/iuran/pay'       => $this->iuranPayForm(),
+                'POST:/iuran/process'  => $this->iuranProcessPay(),
+                'GET:/iuran/print'     => $this->iuranPrint(),
+                
+                // Pembayaran Lain-lain
+                'GET:/pembayaran-lain'         => $this->pembayaranLainList(),
+                'GET:/pembayaran-lain/create'  => $this->pembayaranLainCreateForm(),
+                'POST:/pembayaran-lain/store'  => $this->pembayaranLainCreate(),
+                'GET:/pembayaran-lain/edit'    => $this->pembayaranLainEditForm(),
+                'POST:/pembayaran-lain/update' => $this->pembayaranLainEdit(),
+                'POST:/pembayaran-lain/delete' => $this->pembayaranLainDelete(),
 
                 default => $this->notFound(),
             };
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             $this->serverError($e);
         }
     }
@@ -149,7 +160,7 @@ class Router {
         include dirname(__DIR__) . '/views/error/404.php';
     }
 
-    private function serverError(Exception $e): void {
+    private function serverError(\Throwable $e): void {
         error_log($e->getMessage());
         http_response_code(500);
         include dirname(__DIR__) . '/views/error/500.php';
@@ -390,6 +401,7 @@ class Router {
             'alamat'       => sanitize($_POST['alamat'] ?? '') ?: null,
             'no_telepon'   => sanitize($_POST['no_telepon'] ?? '') ?: null,
             'email'        => sanitize($_POST['email'] ?? '') ?: null,
+            'bidang_studi' => sanitize($_POST['bidang_studi'] ?? '') ?: null,
             'tgl_masuk'    => sanitize($_POST['tgl_masuk'] ?? '') ?: date('Y-m-d'),
             'status'       => 'AKTIF',
         ]);
@@ -421,6 +433,7 @@ class Router {
             'alamat'       => sanitize($_POST['alamat'] ?? '') ?: null,
             'no_telepon'   => sanitize($_POST['no_telepon'] ?? '') ?: null,
             'email'        => sanitize($_POST['email'] ?? '') ?: null,
+            'bidang_studi' => sanitize($_POST['bidang_studi'] ?? '') ?: null,
             'status'       => sanitize($_POST['status'] ?? 'AKTIF'),
         ], "id = $id");
         setFlash('Data guru berhasil diperbarui.', 'success');
@@ -539,6 +552,8 @@ class Router {
             'kategori_pelajaran'  => sanitize($_POST['kategori_pelajaran'] ?? '') ?: null,
             'jam_pembelajaran'    => (int)($_POST['jam_pembelajaran'] ?? 0) ?: null,
             'kurikulum'           => sanitize($_POST['kurikulum'] ?? '') ?: null,
+            'kkm'                 => (int)($_POST['kkm'] ?? 75),
+            'kelompok'            => sanitize($_POST['kelompok'] ?? 'Umum'),
             'is_active'           => 1,
         ]);
         setFlash("Mata pelajaran $nama berhasil ditambahkan.", 'success');
@@ -565,6 +580,8 @@ class Router {
             'kategori_pelajaran' => sanitize($_POST['kategori_pelajaran'] ?? '') ?: null,
             'jam_pembelajaran'   => (int)($_POST['jam_pembelajaran'] ?? 0) ?: null,
             'kurikulum'          => sanitize($_POST['kurikulum'] ?? '') ?: null,
+            'kkm'                => (int)($_POST['kkm'] ?? 75),
+            'kelompok'           => sanitize($_POST['kelompok'] ?? 'Umum'),
             'is_active'          => isset($_POST['is_active']) ? 1 : 0,
         ], "id = $id");
         setFlash('Mata pelajaran berhasil diperbarui.', 'success');
@@ -880,6 +897,113 @@ class Router {
         $this->db()->delete('spp', "id = $id");
         setFlash('Data SPP berhasil dihapus.', 'success');
         redirect('/iuran');
+    }
+
+    private function iuranPayForm(): void {
+        $this->auth();
+        $this->role(['ADMIN', 'TATA_USAHA']);
+        $spp = $this->db()->query("SELECT spp.*, s.nama as siswa_nama, s.no_induk FROM spp JOIN siswa s ON s.id = spp.siswa_id WHERE spp.id = ?", [$this->id()])->fetch();
+        if (!$spp) { setFlash('Data tidak ditemukan.', 'error'); redirect('/iuran'); }
+        $this->render('iuran/pay', compact('spp'));
+    }
+
+    private function iuranProcessPay(): void {
+        $this->auth();
+        $this->role(['ADMIN', 'TATA_USAHA']);
+        $id = $this->id();
+        $this->db()->update('spp', [
+            'status' => 'LUNAS',
+            'tanggal_bayar' => date('Y-m-d'),
+            'metode_bayar' => sanitize($_POST['metode_bayar'] ?? 'TUNAI')
+        ], "id = $id");
+        setFlash('Pembayaran berhasil diterima.', 'success');
+        redirect('/iuran');
+    }
+
+    private function iuranPrint(): void {
+        $this->auth();
+        $this->role(['ADMIN', 'TATA_USAHA']);
+        $spp = $this->db()->query("SELECT spp.*, s.nama as siswa_nama, s.no_induk FROM spp JOIN siswa s ON s.id = spp.siswa_id WHERE spp.id = ?", [$this->id()])->fetch();
+        if (!$spp) die('Data kuitansi tidak ditemukan.');
+        include dirname(__DIR__) . '/views/iuran/print.php';
+    }
+
+    // ─── Pembayaran Lain-lain ─────────────────────────────────────────────────
+
+    private function pembayaranLainList(): void {
+        $this->auth();
+        $this->role(['ADMIN', 'TATA_USAHA']);
+        $db     = $this->db();
+        $page   = (int)($_GET['page'] ?? 1);
+        
+        $sql = "SELECT * FROM pembayaran_lain WHERE is_active = 1 ORDER BY id DESC LIMIT ? OFFSET ?";
+        
+        $perPage = ITEMS_PER_PAGE;
+        $offset  = ($page - 1) * $perPage;
+        $data    = $db->query($sql, [$perPage, $offset])->fetchAll();
+
+        $total = (int)($db->query("SELECT COUNT(*) as c FROM pembayaran_lain WHERE is_active = 1")->fetch()['c'] ?? 0);
+        $pages = max(1, (int)ceil($total / $perPage));
+
+        $result = [
+            'data' => $data, 'page' => $page, 'pages' => $pages,
+            'total' => $total, 'has_prev' => $page > 1, 'has_next' => $page < $pages,
+        ];
+        $this->render('pembayaran_lain/list', compact('result'));
+    }
+
+    private function pembayaranLainCreateForm(): void {
+        $this->auth();
+        $this->role(['ADMIN', 'TATA_USAHA']);
+        $this->render('pembayaran_lain/create');
+    }
+
+    private function pembayaranLainCreate(): void {
+        $this->auth();
+        $this->role(['ADMIN', 'TATA_USAHA']);
+        
+        $this->db()->insert('pembayaran_lain', [
+            'nama_pembayaran'  => sanitize($_POST['nama_pembayaran'] ?? ''),
+            'deskripsi'        => sanitize($_POST['deskripsi'] ?? '') ?: null,
+            'nominal'          => (float)($_POST['nominal'] ?? 0),
+            'tanggal_mulai'    => date('Y-m-d'),
+            'tanggal_berakhir' => sanitize($_POST['tanggal_berakhir'] ?? '') ?: null,
+            'denda_per_hari'   => (float)($_POST['denda_per_hari'] ?? 0),
+            'is_active'        => 1,
+        ]);
+        setFlash('Master pembayaran tambahan berhasil ditambahkan.', 'success');
+        redirect('/pembayaran-lain');
+    }
+
+    private function pembayaranLainEditForm(): void {
+        $this->auth();
+        $this->role(['ADMIN', 'TATA_USAHA']);
+        $tagihan = $this->db()->find('pembayaran_lain', $this->id());
+        if (!$tagihan) { setFlash('Data tidak ditemukan.', 'error'); redirect('/pembayaran-lain'); }
+        $this->render('pembayaran_lain/edit', compact('tagihan'));
+    }
+
+    private function pembayaranLainEdit(): void {
+        $this->auth();
+        $this->role(['ADMIN', 'TATA_USAHA']);
+        $id = $this->id();
+        $this->db()->update('pembayaran_lain', [
+            'nama_pembayaran'  => sanitize($_POST['nama_pembayaran'] ?? ''),
+            'deskripsi'        => sanitize($_POST['deskripsi'] ?? '') ?: null,
+            'nominal'          => (float)($_POST['nominal'] ?? 0),
+            'tanggal_berakhir' => sanitize($_POST['tanggal_berakhir'] ?? '') ?: null,
+            'denda_per_hari'   => (float)($_POST['denda_per_hari'] ?? 0),
+        ], "id = $id");
+        setFlash('Data pembayaran tambahan berhasil diperbarui.', 'success');
+        redirect('/pembayaran-lain');
+    }
+
+    private function pembayaranLainDelete(): void {
+        $this->auth();
+        $this->role(['ADMIN', 'TATA_USAHA']);
+        $this->db()->update('pembayaran_lain', ['is_active' => 0], "id = " . $this->id());
+        setFlash('Data pembayaran berhasil dinonaktifkan.', 'success');
+        redirect('/pembayaran-lain');
     }
 }
 
